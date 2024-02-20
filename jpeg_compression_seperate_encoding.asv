@@ -135,7 +135,7 @@ end
 
 
 %==============Huffman algorithm==============%
-
+%{
 function [hcode, dict, size_layer] = huffman_encoding(channel)
     % Combine Y, Cb, and Cr into a single vector
     vector = zigzag(channel);
@@ -175,6 +175,7 @@ function [hcode, dict, size_layer] = huffman_encoding(channel)
 end
 
 
+
 function [decoded_channel] = huffman_decoding(hcode, dict, m, n)
     % Huffman Decoding
     decoded_vector = huffmandeco(hcode, dict);
@@ -183,3 +184,5 @@ function [decoded_channel] = huffman_decoding(hcode, dict, m, n)
     decoded_channel = izigzag(decoded_vector, m, n);
 
 end
+%}
+

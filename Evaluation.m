@@ -23,7 +23,11 @@ PSNR = zeros(1, 98);
 
 for Q = 0:1:97
     k = k+1    
-    [reconstructed_image, sizeCompressedBits] = jpeg_compression_seperate_encoding(original_image, Q);
+    
+    % Uncomment the function you want to evaluate
+    %[reconstructed_image, sizeCompressedBits] = jpeg_compression_standard_implementation(original_image, Q);
+    [reconstructed_image, sizeCompressedBits] = jpeg_compression_one_encoding(original_image, Q);
+    %[reconstructed_image, sizeCompressedBits] = jpeg_compression_seperate_encoding(original_image, Q);
 
     % Calculate compression ratio
     compressionRatios(k) = sizeOriginalBits / sizeCompressedBits;
@@ -52,27 +56,3 @@ grid on;
 title('Compression Ratio vs. JPEG Quality');
 xlabel('JPEG Quality');
 ylabel('Compression Ratio');
-
-%{
-%==============Evaluation==============%
-function evaluate_compression(original_image, reconstructed_image, compressed_size)
-    % Calculate compression ratio
-    original_size = numel(original_image);
-    compression_ratio = original_size / compressed_size;
-    
-    % Calculate rate
-    rate = compressed_size / original_size;
-    
-    % Calculate distortion (Mean Squared Error)
-    mse = immse(double(reconstructed_image),double(original_image));
-    
-    % Calculate PSNR
-    psnr_value = psnr(double(reconstructed_image),double(original_image),255);
-    
-    % Display the results
-    fprintf('Compression Ratio: %.4f\n', compression_ratio);
-    fprintf('Rate: %.4f\n', rate);
-    fprintf('Distortion (MSE): %.4f\n', mse);
-    fprintf('PSNR: %.4f dB\n', psnr_value);
-end
-%}

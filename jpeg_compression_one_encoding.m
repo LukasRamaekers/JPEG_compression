@@ -85,12 +85,6 @@ end
 %==============Quantization quality==============%
 
 function [QY, QC] = generate_quantization_matrix(quality)
-    % Quality should be between 1 and 100
-    quality = max(1, min(100, quality));
-    
-    % Adjustment factor
-    alpha = 50 / quality;
-
     % Standard JPEG quantization matrix for luminance (Y) channel
     QY = [
     16  11  10  16  24  40  51  61;
@@ -103,8 +97,7 @@ function [QY, QC] = generate_quantization_matrix(quality)
     72  92  95  98 112 100 103  99
     ];
     
-    % Adjust the quantization matrix based on the quality parameter
-    QY = round((alpha * QY + 50) / 100);
+    QY = scale_quantization_table(QY, quality);
     
     % Standard JPEG quantization matrix for chrominance (Cb and Cr) channels
     QC = [
@@ -118,8 +111,29 @@ function [QY, QC] = generate_quantization_matrix(quality)
     99  99  99  99  99  99  99  99
     ];
 
-    % Adjust the quantization matrix for chrominance
-    QC = round((alpha * QC + 50) / 100);
+    QC = scale_quantization_table(QC, quality);
+end
+
+function scaled_table = scale_quantization_table(base_table, quality)
+    % Ensure quality is within the valid range
+    quality = max(1, min(100, quality));
+
+    % Compute the scaling factor S based on the quality factor Q
+    S = (quality < 50) .* (5000 ./ quality) + (quality >= 50) .* (200 - 2 * quality);
+
+    % Initialize the scaled table
+    scaled_table = zeros(size(base_table));
+
+    % Calculate the scaled values using the formula T_s[i] = floor((S * T_b[i] + 50) / 100)
+    for i = 1:numel(base_table)
+        scaled_value = floor((S * base_table(i) + 50) / 100);
+
+        % Ensure that the scaled value is at least 1
+        scaled_value = max(1, scaled_value);
+
+        % Set the scaled value in the table
+        scaled_table(i) = scaled_value;
+    end
 end
 
 %==============Huffman algorithm==============%
